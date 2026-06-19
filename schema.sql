@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS performance    (id text PRIMARY KEY, doc jsonb NOT NU
 CREATE TABLE IF NOT EXISTS documents      (id text PRIMARY KEY, doc jsonb NOT NULL, updated_at timestamptz DEFAULT now());
 CREATE TABLE IF NOT EXISTS leaves         (id text PRIMARY KEY, doc jsonb NOT NULL, updated_at timestamptz DEFAULT now());
 CREATE TABLE IF NOT EXISTS notifications  (id text PRIMARY KEY, doc jsonb NOT NULL, updated_at timestamptz DEFAULT now());
+CREATE TABLE IF NOT EXISTS recruiters      (id text PRIMARY KEY, doc jsonb NOT NULL, updated_at timestamptz DEFAULT now());
 CREATE TABLE IF NOT EXISTS audit_logs     (id text PRIMARY KEY, doc jsonb NOT NULL, updated_at timestamptz DEFAULT now());
 
 -- Tez-tez ishlatiladigan JSONB maydonlar bo'yicha indekslar
