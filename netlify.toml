@@ -1,21 +1,18 @@
 [build]
   publish = "public"
   functions = "netlify/functions"
-  command = "npm run migrate"
+  command = "npm install"
 
 [functions]
   node_bundler = "esbuild"
-  # pg va seed fayllari funksiya bundle'iga kirsin
   included_files = ["schema.sql", "src/**"]
   external_node_modules = ["pg"]
 
-# Frontenddan /api/* so'rovlari serverless funksiyaga yo'naltiriladi
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/api/:splat"
   status = 200
 
-# Qolgan barcha yo'llar SPA uchun index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"

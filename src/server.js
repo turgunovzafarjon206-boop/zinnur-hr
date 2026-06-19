@@ -4,6 +4,32 @@ const express = require("express");
 require("dotenv").config();
 const { pool } = require("./db");
 const { buildSeed, TABLES } = require("./seed");
+const fs = require("fs");
+let _migrated = false;
+async function ensureMigrated() {
+  if (_migrated) return;
+  _migrated = true;
+  try {
+    const schema = fs.readFileSync(path.join(__dirname, "..", "schema.sql"), "utf8");
+    const client = await pool.connect();
+    try {
+      await client.query(schema);
+      const { rows } = await client.query("SELECT count(*)::int AS n FROM users");
+      if (rows[0].n === 0) {
+        const seed = buildSeed();
+        await client.query("BEGIN");
+        for (const [key, table] of Object.entries(TABLES)) {
+          for (const row of (seed[key] || []))
+            await client.query("INSERT INTO "+table+"(id,doc) VALUES($1,$2) ON CONFLICT DO NOTHING", [String(row.id), row]);
+        }
+        await client.query("COMMIT");
+        console.log("✓ Auto-migrate va seed tugadi");
+      } else {
+        console.log("✓ Baza tayyor (" + rows[0].n + " foydalanuvchi)");
+      }
+    } finally { client.release(); }
+  } catch(e) { console.error("Auto-migrate xato:", e.message); _migrated = false; }
+}
 
 const app = express();
 app.use(express.json({ limit: "8mb" }));
@@ -32,7 +58,7 @@ const stripPw = (u) => { const c = { ...u }; if (c.access) c.access = u.access; 
 
 /* ---- health ---- */
 app.get("/api/health", async (_req, res) => {
-  try { await pool.query("SELECT 1"); res.json({ ok: true }); }
+  try { await ensureMigrated(); await pool.query("SELECT 1"); res.json({ ok: true }); }
   catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
@@ -41,6 +67,7 @@ app.post("/api/login", async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: "Login va parol kiriting" });
   try {
+    await ensureMigrated();
     const { rows } = await pool.query("SELECT doc FROM users WHERE doc->>'username'=$1 LIMIT 1", [String(username).trim()]);
     const u = rows[0]?.doc;
     if (!u || u._deleted || u.password !== password || u.status !== "Faol") return res.status(401).json({ error: "Login yoki parol noto'g'ri" });
