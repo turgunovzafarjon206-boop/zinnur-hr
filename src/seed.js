@@ -143,6 +143,11 @@ function buildSeed() {
     vacancies: seedVacancies(), recruitEntries: seedRecruitEntries(), adaptation: seedAdaptation(employees), finance: seedFinance(),
     payrolls: seedPayroll(employees), tasks: seedTasks(employees), documents: seedDocs(employees), departments: DEPTS.map(d => ({ ...d })), positions: POSITIONS.map(p => ({ ...p })),
     performance: employees.slice(0, 10).map((e, i) => ({ id: "pf" + i, employee: e.firstName + " " + e.lastName, dept: e.dept, period: "2026 Q2", kpi: 60 + (i * 7) % 40, rating: ["A", "B", "B", "C", "A"][i % 5], reviewer: "Sardor Aliyev", status: ["Bajarildi", "Jarayonda", "Tekshiruvda"][i % 3] })),
+    recruiters: [
+      { id: "r1", name: "Madina Rashidova", status: "Faol" },
+      { id: "r2", name: "Kamola Saidova", status: "Faol" },
+      { id: "r3", name: "Otabek Ergashev", status: "Faol" },
+    ],
     notifications: [
       { id: "n1", type: "candidates", title: "Yangi nomzod", body: "Zarina M. — Marketolog", time: "10 daqiqa oldin", read: false },
       { id: "n2", type: "payroll", title: "Oylik tayyor", body: "May oyligi hisoblandi", time: "1 soat oldin", read: false },
@@ -157,7 +162,7 @@ const TABLES = {
   users: "users", branches: "branches", employees: "employees", departments: "departments", positions: "positions",
   vacancies: "vacancies", candidates: "candidates", recruitEntries: "recruit_entries", adaptation: "adaptation",
   finance: "finance", payrolls: "payrolls", tasks: "tasks", performance: "performance", documents: "documents",
-  leaves: "leaves", notifications: "notifications", auditLogs: "audit_logs",
+  leaves: "leaves", recruiters: "recruiters", notifications: "notifications", auditLogs: "audit_logs",
 };
 
 module.exports = { buildSeed, TABLES };
